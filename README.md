@@ -19,6 +19,6 @@ https://docs.google.com/presentation/d/1zlD7MhYNIyY4kjDl_UNK21SwG8tKldvxfADKVmXL
 
 Install Node.js + mongoDb:
 
-gist.github.com/tejaswigowda/f289e9bff13d152876e8d4b3281142f8
+https://gist.github.com/tejaswigowda/f289e9bff13d152876e8d4b3281142f8
 
 
