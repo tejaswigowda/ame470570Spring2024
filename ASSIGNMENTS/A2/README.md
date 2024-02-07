@@ -1,5 +1,5 @@
 # Assignment 2
-`Due Jan 29, before class`
+`Due Jan 29, before midnight`
 
 ## Task
 
