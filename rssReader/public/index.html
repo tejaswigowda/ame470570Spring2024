@@ -3,8 +3,32 @@
     <head>
         <title>RSS Reader</title>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script>
+            function main() {
+                $.ajax({
+                    url: 'https://rss.applemarketingtools.com/api/v2/us/podcasts/top/10/podcasts.json',
+                    type: 'GET',
+                    success: function(data) {
+                        console.log(data);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            }
+        </script>
     </head>
-    <body>
+    <body onload="main()">
+
+        <div id="box"> </div>
 
     </body>
+    <style>
+        #box {
+            width: 200px;
+            height: 200px;
+            background-color: #5b0808;
+            display: block;
+        }
+    </style>
 </html>
