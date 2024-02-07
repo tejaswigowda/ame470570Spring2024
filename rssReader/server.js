@@ -5,9 +5,15 @@ var errorHandler = require('errorhandler');
 var methodOverride = require('method-override');
 var hostname = process.env.HOSTNAME || 'localhost';
 var port = 8080;
+var client = require('node-rest-client').Client;
+var restClient = new client();
 
-app.get("/", function (req, res) {
-    res.redirect("index.html")
+app.get("/getFeed", function (req, res) {
+    var url = req.query.url;
+    restClient.get(url, function (data, response) {
+        res.send(data);
+    });
+
 });
 
 app.use(methodOverride());
