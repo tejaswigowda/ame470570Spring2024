@@ -13,7 +13,6 @@ app.get("/getFeed", function (req, res) {
     restClient.get(url, function (data, response) {
         res.send(data);
     });
-
 });
 
 app.use(methodOverride());
