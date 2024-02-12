@@ -35,10 +35,9 @@
                 var markup = "<h1>" + item.name + "</h1>" +
                   "<h2>" + item.artistName + "</h2>" +
                   "<img src='" + item.artworkUrl100 + "' />" +
-                  "<p>" + item.collectionName + "</p>" +
                   "<p>" + item.releaseDate + "</p>" +
                   "<p>" + item.genres[0].name + "</p>" +
-                  "<p>" + item.url + "</p>";
+                  "<a target='_blank' href='" + item.url + "'>" + item.url + "</a>";
                 $('#feedDetails').html(markup);
             }
 
