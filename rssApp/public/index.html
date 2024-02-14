@@ -6,8 +6,28 @@
         <script>
             var allFeeds = null;
             var allItems = null;
-            function main() {
-                return;
+            var main = function() {
+                $.ajax({
+                    url: './getFeeds',
+                    type: 'GET',
+                    success: function(data) {
+                        console.log(data);
+                        allFeeds = data;
+                        var markup = '';
+                        for (var i = 0; i < allFeeds.length; i++) {
+                            markup += '<button onclick="loadFeed('+ i + ')">' + allFeeds[i].url + '</button>';
+                        }
+                        $('#allFeeds').html(markup);
+                     
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            }
+
+
+            function displayFeed() {
                 $.ajax({
                     url: './getFeed?url=' + window.location.hash.replace('#', ''),
                     type: 'GET',
