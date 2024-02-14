@@ -4,9 +4,14 @@ var bodyParser = require('body-parser');
 var errorHandler = require('errorhandler');
 var methodOverride = require('method-override');
 var hostname = process.env.HOSTNAME || 'localhost';
+var MS = require("mongoskin");
 var port = 8080;
 var client = require('node-rest-client').Client;
 var restClient = new client();
+
+var dbserverip = process.argv.slice(2)[0]
+console.log(ip);
+var db = MS.db("mongodb://" + dbserverip + ":27017/rssApp" , {native_parser: true});
 
 app.get("/getFeed", function (req, res) {
     var url = req.query.url;
