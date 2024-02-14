@@ -11,6 +11,7 @@ var restClient = new client();
 
 var dbserverip = process.argv.slice(2)[0]
 console.log(dbserverip);
+
 var db = MS.db("mongodb://" + dbserverip + ":27017/rssApp" , {native_parser: true});
 
 app.get("/getFeed", function (req, res) {
