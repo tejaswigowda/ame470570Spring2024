@@ -24,7 +24,16 @@ app.get("/getFeed", function (req, res) {
 app.get("/addFeed", function (req, res) {
     var url = req.query.url;
     console.log(url);
-    res.send("1");
+    var obj = {
+        url: url,
+        name: "Untitled",
+        time: new Date().getTime()
+    };
+
+    db.collection('feeds').insert(obj, function (err, result) {
+        res.end(result);
+    });
+
 });
 
 app.use(methodOverride());
