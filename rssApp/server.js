@@ -31,7 +31,7 @@ app.get("/addFeed", function (req, res) {
     };
 
     db.collection('feeds').insert(obj, function (err, result) {
-        res.end(result);
+        res.end("1");
     });
 
 });
