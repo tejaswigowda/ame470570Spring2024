@@ -27,34 +27,40 @@
         function generateFeedList() {
             var markup = '';
             for (var i = 0; i < allFeeds.length; i++) {
-                markup += '<button onclick="loadFeed(' + i + ')">' + allFeeds[i].url + '</button>';
+                markup += '<button onclick="loadFeed(' + i + ')"><h2>' + allFeeds[i].name + "</h2><p>" + allFeeds[i].url + '</p></button>';
             }
             $('#allFeeds').html(markup);
         }
 
 
 
-        function generateItemList() {
-            var markup = '';
-            allItems = allFeeds.feed.results;
-            for (var i = 0; i < allItems.length; i++) {
-                markup += '<button onclick="showDetails(' + i + ')">' +
-                    "<div class='thumb' style='background-image: url(" + allItems[i].artworkUrl100 + ")'></div>" +
-                    "<h1>" + allItems[i].name + "</h1>" +
-                    "<h2>" + allItems[i].artistName + "</h2>" +
-                    '</button>';
-            }
-            $('#feedList').html(markup);
+
+        function loadFeed(index) {
+            $("#allFeeds button").removeClass("selected");
+            $("#allFeeds button:nth-of-type(" + (index+1)+ ")").addClass("selected");
+            $("#mainMenu2").fadeIn();
+            //('Loading feed ' + index);
+            var url = allFeeds[index].url;
+        
+            displayFeed(url);
 
         }
-        function displayFeed() {
+        function displayFeed(url) {
             $.ajax({
-                url: './getFeed?url=' + window.location.hash.replace('#', ''),
+                url: './getFeed?url=' + url,
                 type: 'GET',
                 success: function (data) {
                     console.log(data);
-                    allFeeds = data;
-                    generateFeedList();
+                    allItems = data.feed.results;
+                    var markup = '';
+                    for (var i = 0; i < allItems.length; i++) {
+                        markup += '<button onclick="showDetails(' + i + ')">' +
+                            '<div class="thumb" style="background-image:url(' + allItems[i].artworkUrl100 + ')"></div>' +
+                            '<h1>' + allItems[i].name + '</h1>' +
+                            '<h2>' + allItems[i].artistName + '</h2>' +
+                            '</button>';
+                    }
+                    $('#feedList').html(markup);
                 },
                 error: function (error) {
                     console.log(error);
@@ -63,12 +69,14 @@
         }
 
         var showDetails = function (index) {
+            $("#feedList button").removeClass("selected");
+            $("#feedList button:nth-of-type(" + (index+1)+ ")").addClass("selected");
             var item = allItems[index];
             var markup = "<h1>" + item.name + "</h1>" +
                 "<h2>" + item.artistName + "</h2>" +
                 "<img src='" + item.artworkUrl100 + "' />" +
                 "<p>" + item.releaseDate + "</p>" +
-                "<p>" + item.genres[0].name + "</p>" +
+                //"<p>" + item.genres[0].name + "</p>" +
                 "<a target='_blank' href='" + item.url + "'>" + item.url + "</a>";
             $('#feedDetails').html(markup);
         }
@@ -99,7 +107,11 @@
         <button onclick="addNewFeed()">Add New Feed</button>
         <div id="allFeeds"> </div>
     </div>
+    <div id="mainMenu2" style="display:none">
+        <button style='margin-left:-470px' onclick="editFeed()">Edit Feed</button>
+        <button onclick="deleteFeed()">Delete Feed</button>
     <div id="feedList"> </div>
+    </div>
     <div id="feedDetails"> </div>
 </body>
 <style>
@@ -147,6 +159,27 @@
         float: left;
         background-size: cover;
         background-position: center;
+    }
+
+    #allFeeds button {
+        width: 100%;
+        min-height: 100px;
+        border: none;
+        display: block;
+        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+    }   
+    #allFeeds button h2 {
+        margin: 0;
+    }
+    #allFeeds button p {
+        margin: 0;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+
+    }
+    .selected {
+        background-color: gold;
     }
 </style>
 
