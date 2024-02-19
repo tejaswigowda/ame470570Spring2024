@@ -14,11 +14,7 @@
                 success: function (data) {
                     console.log(data);
                     allFeeds = data;
-                    var markup = '';
-                    for (var i = 0; i < allFeeds.length; i++) {
-                        markup += '<button onclick="loadFeed(' + i + ')">' + allFeeds[i].url + '</button>';
-                    }
-                    $('#allFeeds').html(markup);
+                    generateFeedList();
 
                 },
                 error: function (error) {
@@ -29,6 +25,16 @@
 
 
         function generateFeedList() {
+            var markup = '';
+            for (var i = 0; i < allFeeds.length; i++) {
+                markup += '<button onclick="loadFeed(' + i + ')">' + allFeeds[i].url + '</button>';
+            }
+            $('#allFeeds').html(markup);
+        }
+
+
+
+        function generateItemList() {
             var markup = '';
             allItems = allFeeds.feed.results;
             for (var i = 0; i < allItems.length; i++) {
