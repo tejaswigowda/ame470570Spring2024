@@ -1,134 +1,147 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>RSS Reader</title>
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-        <script>
-            var allFeeds = null;
-            var allItems = null;
-            var main = function() {
-                $.ajax({
-                    url: './getFeeds',
-                    type: 'GET',
-                    success: function(data) {
-                        console.log(data);
-                        allFeeds = data;
-                        var markup = '';
-                        for (var i = 0; i < allFeeds.length; i++) {
-                            markup += '<button onclick="loadFeed('+ i + ')">' + allFeeds[i].url + '</button>';
-                        }
-                        $('#allFeeds').html(markup);
-                     
-                    },
-                    error: function(error) {
-                        console.log(error);
+
+<head>
+    <title>RSS Reader</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        var allFeeds = null;
+        var allItems = null;
+        var main = function () {
+            $.ajax({
+                url: './getFeeds',
+                type: 'GET',
+                success: function (data) {
+                    console.log(data);
+                    allFeeds = data;
+                    var markup = '';
+                    for (var i = 0; i < allFeeds.length; i++) {
+                        markup += '<button onclick="loadFeed(' + i + ')">' + allFeeds[i].url + '</button>';
                     }
-                });
-            }
+                    $('#allFeeds').html(markup);
 
-
-            function displayFeed() {
-                $.ajax({
-                    url: './getFeed?url=' + window.location.hash.replace('#', ''),
-                    type: 'GET',
-                    success: function(data) {
-                        console.log(data);
-                        allFeeds = data;
-                        var markup = '';
-                        allItems = allFeeds.feed.results;
-                        for (var i = 0; i < allItems.length; i++) {
-                            markup += '<button onclick="showDetails(' + i + ')">' + 
-                              "<div class='thumb' style='background-image: url(" + allItems[i].artworkUrl100 + ")'></div>" +
-                              "<h1>"  + allItems[i].name +  "</h1>" +
-                              "<h2>"  + allItems[i].artistName +  "</h2>" +
-                            '</button>';
-                        }
-                        $('#feedList').html(markup);
-                    },
-                    error: function(error) {
-                        console.log(error);
-                    }
-                });
-            }
-
-            var showDetails = function(index) {
-                var item = allItems[index];
-                var markup = "<h1>" + item.name + "</h1>" +
-                  "<h2>" + item.artistName + "</h2>" +
-                  "<img src='" + item.artworkUrl100 + "' />" +
-                  "<p>" + item.releaseDate + "</p>" +
-                  "<p>" + item.genres[0].name + "</p>" +
-                  "<a target='_blank' href='" + item.url + "'>" + item.url + "</a>";
-                $('#feedDetails').html(markup);
-            }
-
-            var addNewFeed = function() {
-                var url = prompt('Enter the URL of the RSS feed');
-                if (url) {
-                    console.log(url);
-                    $.ajax({
-                        url: './addFeed?url=' + url,
-                        type: 'GET',
-                        success: function(data) {
-                  
-                        },
-                        error: function(error) {
-                            console.log(error);
-                        }
-                    });
+                },
+                error: function (error) {
+                    console.log(error);
                 }
-            }
+            });
+        }
 
-        </script>
-    </head>
-    <body onload="main()">
-        <div id="mainMenu"> 
-            <button onclick="addNewFeed()">Add New Feed</button>
-            <div id="allFeeds"> </div>
-        </div>
-        <div id="feedList"> </div>
-        <div id="feedDetails"> </div>
-    </body>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
+
+        function generateFeedList() {
+            var markup = '';
+            allItems = allFeeds.feed.results;
+            for (var i = 0; i < allItems.length; i++) {
+                markup += '<button onclick="showDetails(' + i + ')">' +
+                    "<div class='thumb' style='background-image: url(" + allItems[i].artworkUrl100 + ")'></div>" +
+                    "<h1>" + allItems[i].name + "</h1>" +
+                    "<h2>" + allItems[i].artistName + "</h2>" +
+                    '</button>';
+            }
+            $('#feedList').html(markup);
+
         }
-        #mainMenu {
-            width: 300px;
-            float: left;
-            height: 100vh;
-            background-color: rgb(255, 0, 162);
+        function displayFeed() {
+            $.ajax({
+                url: './getFeed?url=' + window.location.hash.replace('#', ''),
+                type: 'GET',
+                success: function (data) {
+                    console.log(data);
+                    allFeeds = data;
+                    generateFeedList();
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
         }
-        #feedList {
-            width: 300px;
-            float: left;
-            height: 100vh;
-            background-color: aqua;
+
+        var showDetails = function (index) {
+            var item = allItems[index];
+            var markup = "<h1>" + item.name + "</h1>" +
+                "<h2>" + item.artistName + "</h2>" +
+                "<img src='" + item.artworkUrl100 + "' />" +
+                "<p>" + item.releaseDate + "</p>" +
+                "<p>" + item.genres[0].name + "</p>" +
+                "<a target='_blank' href='" + item.url + "'>" + item.url + "</a>";
+            $('#feedDetails').html(markup);
         }
-        #feedDetails {
-            width: calc(100vw - 600px);
-            float: right;
-            height: 100vh;
-            background-color: beige;
-            text-align: center;
-            font-size: 200%;
-            position: fixed;
-            right:0;
+
+        var addNewFeed = function () {
+            var url = prompt('Enter the URL of the RSS feed');
+            if (url) {
+                console.log(url);
+                $.ajax({
+                    url: './addFeed?url=' + url,
+                    type: 'GET',
+                    success: function (data) {
+                        allFeeds = data;
+                        generateFeedList();
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            }
         }
-        #feedList button {
-            width: 100%;
-            min-height: 100px;
-            border: none;
-            display: block;
-            box-shadow: 0 0 5px 0 rgba(0,0,0,0.5);
-        }
-        #feedList button .thumb {
-            width: 100px;
-            height: 100px;
-            float: left;
-            background-size: cover;
-            background-position: center;
-        }
-    </style>
+
+    </script>
+</head>
+
+<body onload="main()">
+    <div id="mainMenu">
+        <button onclick="addNewFeed()">Add New Feed</button>
+        <div id="allFeeds"> </div>
+    </div>
+    <div id="feedList"> </div>
+    <div id="feedDetails"> </div>
+</body>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    #mainMenu {
+        width: 300px;
+        float: left;
+        height: 100vh;
+        background-color: rgb(255, 0, 162);
+    }
+
+    #feedList {
+        width: 300px;
+        float: left;
+        height: 100vh;
+        background-color: aqua;
+    }
+
+    #feedDetails {
+        width: calc(100vw - 600px);
+        float: right;
+        height: 100vh;
+        background-color: beige;
+        text-align: center;
+        font-size: 200%;
+        position: fixed;
+        right: 0;
+    }
+
+    #feedList button {
+        width: 100%;
+        min-height: 100px;
+        border: none;
+        display: block;
+        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+    }
+
+    #feedList button .thumb {
+        width: 100px;
+        height: 100px;
+        float: left;
+        background-size: cover;
+        background-position: center;
+    }
+</style>
+
 </html>
