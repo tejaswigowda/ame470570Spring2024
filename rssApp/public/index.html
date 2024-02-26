@@ -7,6 +7,7 @@
     <script>
         var allFeeds = null;
         var allItems = null;
+        currSelectedFeed = null;
         var main = function () {
             $.ajax({
                 url: './getFeeds',
@@ -24,6 +25,25 @@
         }
 
 
+        function editFeed(){
+            var item = allFeeds[currSelectedFeed];
+            var newName = prompt('Enter the new name for the feed', item.name);
+            if (newName) {
+                console.log(newName);
+                $.ajax({
+                    url: './editFeed?id=' + item._id + '&name=' + newName,
+                    type: 'GET',
+                    success: function (data) {
+                        allFeeds = data;
+                        generateFeedList();
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            }
+        }
+
         function generateFeedList() {
             var markup = '';
             for (var i = 0; i < allFeeds.length; i++) {
@@ -36,6 +56,7 @@
 
 
         function loadFeed(index) {
+            currSelectedFeed = index;
             $("#allFeeds button").removeClass("selected");
             $("#allFeeds button:nth-of-type(" + (index+1)+ ")").addClass("selected");
             $("#mainMenu2").fadeIn();
@@ -43,7 +64,6 @@
             var url = allFeeds[index].url;
         
             displayFeed(url);
-
         }
         function displayFeed(url) {
             $.ajax({
