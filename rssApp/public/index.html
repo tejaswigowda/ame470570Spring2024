@@ -34,8 +34,8 @@
                     url: './editFeed?id=' + item._id + '&name=' + newName,
                     type: 'GET',
                     success: function (data) {
-                        allFeeds = data;
-                        generateFeedList();
+                        allFeeds[currSelectedFeed].name = newName;
+                        $("#allFeeds button:nth-of-type(" + (currSelectedFeed+1)+ ") h2").html(newName);
                     },
                     error: function (error) {
                         console.log(error);
