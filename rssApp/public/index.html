@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RSS Reader</title>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script>
@@ -72,20 +73,56 @@
                 success: function (data) {
                     console.log(data);
                     allItems = data.feed.results;
-                    var markup = '';
-                    for (var i = 0; i < allItems.length; i++) {
-                        markup += '<button onclick="showDetails(' + i + ')">' +
-                            '<div class="thumb" style="background-image:url(' + allItems[i].artworkUrl100 + ')"></div>' +
-                            '<h1>' + allItems[i].name + '</h1>' +
-                            '<h2>' + allItems[i].artistName + '</h2>' +
-                            '</button>';
-                    }
-                    $('#feedList').html(markup);
+                    generateItemList();
+                    
                 },
                 error: function (error) {
                     console.log(error);
                 }
             });
+        }
+
+        function generateItemList(){
+            var sortedArray = allItems;
+            var sortSel = document.getElementById("sort").value;
+
+            if(sortSel === "name"){
+                sortedArray.sort(function(a, b){
+                    var nameA=a.name.toLowerCase(), nameB=b.name.toLowerCase()
+                    if (nameA < nameB) //sort string ascending
+                        return -1 
+                    if (nameA > nameB)
+                        return 1
+                    return 0 //default return value (no sorting)
+                });
+            }
+            else if(sortSel === "artistName"){
+                sortedArray.sort(function(a, b){
+                    var nameA=a.artistName.toLowerCase(), nameB=b.artistName.toLowerCase()
+                    if (nameA < nameB) //sort string ascending
+                        return -1 
+                    if (nameA > nameB)
+                        return 1
+                    return 0 //default return value (no sorting)
+                });
+            }
+            else if(sortSel === "releaseDate"){
+                sortedArray.sort(function(a, b){
+                    var dateA=new Date(a.releaseDate).getTime(), dateB=new Date(b.releaseDate).getTime()
+                    return dateA-dateB //sort by date ascending
+                });
+            }   
+
+
+            var markup = '';
+                    for (var i = 0; i < sortedArray.length; i++) {
+                        markup += '<button onclick="showDetails(' + i + ')">' +
+                            '<div class="thumb" style="background-image:url(' + sortedArray[i].artworkUrl100 + ')"></div>' +
+                            '<h1>' + sortedArray[i].name + '</h1>' +
+                            '<h2>' + sortedArray[i].artistName + '</h2>' +
+                            '</button>';
+                    }
+                    $('#feedList').html(markup);
         }
 
         var showDetails = function (index) {
@@ -130,7 +167,13 @@
     <div id="mainMenu2" style="display:none">
         <button style='margin-left:-470px' onclick="editFeed()">Edit Feed</button>
         <button onclick="deleteFeed()">Delete Feed</button>
-    <div id="feedList"> </div>
+        <select id="sort" onchange="generateItemList()">
+            <option value="default">Default</option>
+            <option value="name">Name</option>
+            <option value="artistName">Artist</option>
+            <option value="releaseDate">Release Date</option>
+        </select>   
+        <div id="feedList"> </div>
     </div>
     <div id="feedDetails"> </div>
 </body>
@@ -200,6 +243,23 @@
     }
     .selected {
         background-color: gold;
+    }
+
+
+    @media (max-width: 600px) {
+        #mainMenu {
+            width: 100vw;
+        }
+
+        #mainMenu2 {
+            width: 100vw;
+            display: none;
+        }
+
+        #feedDetails {
+            width: 100vw;
+            display: none;
+        }
     }
 </style>
 

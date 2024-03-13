@@ -13,6 +13,7 @@ var dbserverip = process.argv.slice(2)[0]
 console.log(dbserverip);
 var db = MS.db("mongodb://" + dbserverip + ":27017/rssApp" , {native_parser: true});
 
+
 app.get("/getFeed", function (req, res) {
     var url = req.query.url;
     restClient.get(url, function (data, response) {
@@ -40,8 +41,9 @@ app.get("/addFeed", function (req, res) {
         time: new Date().getTime()
     };
 
-    db.collection('feeds').insert(obj, function (err, result) {
-        db.collection('feeds').find().toArray(function (err, items) {
+    db.collection('feeds').insertOne(obj, function (err, result) {
+        console.log(err);
+        db.collection('feeds').find().toArray(function (err1, items) {
             res.send(items);
         });
     });
