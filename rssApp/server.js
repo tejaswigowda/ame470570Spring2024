@@ -32,6 +32,15 @@ app.get("/editFeed", function (req, res) {
     });
 });
 
+app.get("/deleteFeed", function (req, res) {
+    var id = req.query.id;
+    db.collection('feeds').remove({ _id: MS.helper.toObjectID(id) }, function (err, result) {
+        db.collection('feeds').find().toArray(function (err1, items) {
+            res.send(items);
+        });
+    });
+});
+
 app.get("/addFeed", function (req, res) {
     var url = req.query.url;
     console.log(url);
