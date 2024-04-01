@@ -11,6 +11,8 @@ Starting with the draft of the data flow diagram please complete all the client-
 - `/tryLogin` - an API that logs the user in
 - `/tryRegister` - an API that registers a new user
 
+Also please include descriptions of the data that is being passed between the client and the server.
+
 ## Submission
 
-Please submit your assignment by pushing your diagram to your GitHub repository. 
+Please submit your assignment by pushing your diagram/README.md to your GitHub repository. Include code snippets when relevant.
