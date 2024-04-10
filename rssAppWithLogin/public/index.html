@@ -6,6 +6,8 @@
   <script src='asyncReq.js'></script>
   <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   <script>
+    var userObj = null;
+
     var main = function () {
       // check whether user is logged in
       loadFile("/loginStatus", function (data) {
@@ -15,13 +17,14 @@
         }
         else {
           //document.getElementById("accountInfo").innerHTML = data;
+          userObj = JSON.parse(data);
           main2();
         }
       });
     }
 
     var doLogout = function () {
-      var x = confirm("Logout now?")
+      var x = confirm("Logout as " + userObj.local.email + " now?")
       if (x) {
         loadFile("./logout", function (d) { window.location.reload() })
       }

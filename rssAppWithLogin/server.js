@@ -4,8 +4,9 @@ var passport = require('passport');
 var fs = require('fs');
 	var dbURL = 'mongodb://127.0.0.1:27017/test';
 var path = require('path'),
-  express = require('express'),
-  db = require('mongoskin').db(dbURL);
+  express = require('express');
+  var MS = require('mongoskin');
+  var db = MS.db(dbURL);
 var client = require('node-rest-client').Client;
 var restClient = new client();
 
@@ -47,10 +48,10 @@ app.get("/getFeed", function (req, res) {
   });
 });
 
-app.get("/editFeed", function (req, res) {
+app.get("/editFeed", isLoggedIn, function (req, res) {
   var url = req.query.id;
   var name = req.query.name;
-  db.collection('feeds').findOne({ _id: MS.helper.toObjectID(url) }, function (err, result) {
+  db.collection('feeds').findOne({ _id: MS.helper.toObjectID(url), userid:req.user.local.email }, function (err, result) {
       result.name = name;
       db.collection('feeds').save(result, function (err, result) {
           res.send("ok");
@@ -58,34 +59,36 @@ app.get("/editFeed", function (req, res) {
   });
 });
 
-app.get("/deleteFeed", function (req, res) {
+app.get("/deleteFeed", isLoggedIn, function (req, res) {
   var id = req.query.id;
-  db.collection('feeds').remove({ _id: MS.helper.toObjectID(id) }, function (err, result) {
-      db.collection('feeds').find().toArray(function (err1, items) {
+  db.collection('feeds').remove({ _id: MS.helper.toObjectID(id), userid:req.user.local.email }, function (err, result) {
+      db.collection('feeds').find({userid:req.user.local.email}).toArray(function (err1, items) {
           res.send(items);
       });
   });
 });
 
-app.get("/addFeed", function (req, res) {
+app.get("/addFeed", isLoggedIn, function (req, res) {
   var url = req.query.url;
+  console.log(req.user);
   console.log(url);
   var obj = {
       url: url,
       name: "Untitled",
-      time: new Date().getTime()
+      time: new Date().getTime(),
+      userid: req.user.local.email
   };
 
   db.collection('feeds').insertOne(obj, function (err, result) {
       console.log(err);
-      db.collection('feeds').find().toArray(function (err1, items) {
+      db.collection('feeds').find({userid:req.user.local.email}).toArray(function (err1, items) {
           res.send(items);
       });
   });
 });
 
-app.get("/getFeeds", function (req, res) {
-  db.collection('feeds').find().toArray(function (err, items) {
+app.get("/getFeeds", isLoggedIn, function (req, res) {
+  db.collection('feeds').find({userid:req.user.local.email}).toArray(function (err, items) {
       res.send(items);
   });
 });
