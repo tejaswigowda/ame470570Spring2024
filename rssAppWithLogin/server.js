@@ -6,6 +6,9 @@ var fs = require('fs');
 var path = require('path'),
   express = require('express'),
   db = require('mongoskin').db(dbURL);
+var client = require('node-rest-client').Client;
+var restClient = new client();
+
 
 
 var mongoose = require('mongoose');
@@ -37,14 +40,56 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 require('./passport/config/passport')(passport); // pass passport for configuration
 require('./passport/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
 
+app.get("/getFeed", function (req, res) {
+  var url = req.query.url;
+  restClient.get(url, function (data, response) {
+      res.send(data);
+  });
+});
 
-app.get("/addProject", isLoggedIn, function(req,res){
+app.get("/editFeed", function (req, res) {
+  var url = req.query.id;
+  var name = req.query.name;
+  db.collection('feeds').findOne({ _id: MS.helper.toObjectID(url) }, function (err, result) {
+      result.name = name;
+      db.collection('feeds').save(result, function (err, result) {
+          res.send("ok");
+      });
+  });
+});
 
-})
+app.get("/deleteFeed", function (req, res) {
+  var id = req.query.id;
+  db.collection('feeds').remove({ _id: MS.helper.toObjectID(id) }, function (err, result) {
+      db.collection('feeds').find().toArray(function (err1, items) {
+          res.send(items);
+      });
+  });
+});
 
-app.get("/getProjects", function(req,res){
+app.get("/addFeed", function (req, res) {
+  var url = req.query.url;
+  console.log(url);
+  var obj = {
+      url: url,
+      name: "Untitled",
+      time: new Date().getTime()
+  };
 
-})
+  db.collection('feeds').insertOne(obj, function (err, result) {
+      console.log(err);
+      db.collection('feeds').find().toArray(function (err1, items) {
+          res.send(items);
+      });
+  });
+});
+
+app.get("/getFeeds", function (req, res) {
+  db.collection('feeds').find().toArray(function (err, items) {
+      res.send(items);
+  });
+});
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.listen(8080);
