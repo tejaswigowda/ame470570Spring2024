@@ -44,7 +44,7 @@ app.post('/uploadBase64', function(req, res) {
         db.collection("images").insert({name: "Untitled", url: intname, userID:req.user.local.email}, function(err, result) {
             res.end("success");
             console.log(err);
-        }
+        });
     });
 });
 
