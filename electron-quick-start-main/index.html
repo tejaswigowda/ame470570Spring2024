@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
-
+        var mainurl = 'http://localhost:8080/';
         var allFeeds = null;
         var allItems = null;
         currSelectedFeed = null;
@@ -18,7 +18,7 @@
             modalinstances = M.Modal.init(elems, {});
 
             $.ajax({
-                url: 'http://localhost:8080/getFeeds',
+                url: mainurl + 'getFeeds',
                 type: 'GET',
                 success: function (data) {
                     console.log(data);
@@ -58,7 +58,7 @@
             if (newName) {
                 console.log(newName);
                 $.ajax({
-                    url: './editFeed?id=' + item._id + '&name=' + newName,
+                    url: mainurl + 'editFeed?id=' + item._id + '&name=' + newName,
                     type: 'GET',
                     success: function (data) {
                         allFeeds[currSelectedFeed].name = newName;
@@ -95,7 +95,7 @@
         }
         function displayFeed(url) {
             $.ajax({
-                url: 'http://localhost:8080/getFeed?url=' + url,
+                url: mainurl + 'getFeed?url=' + url,
                 type: 'GET',
                 success: function (data) {
                     console.log(data);
@@ -189,7 +189,7 @@
             if (url.length > 0 && url.indexOf('http') === 0){
                 console.log(url);
                 $.ajax({
-                    url: 'http://localhost:8080/addFeed?url=' + url,
+                    url: mainurl + 'addFeed?url=' + url,
                     type: 'GET',
                     success: function (data) {
                         allFeeds = data;
