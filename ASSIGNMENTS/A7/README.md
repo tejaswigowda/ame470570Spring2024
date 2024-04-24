@@ -3,7 +3,7 @@
 
 ## Task
 
-Starting with rhe code handout (identical to `s3Eg` done in class), please serve this S3 uploader example over HTTPS.
+Starting with the code handout (identical to `s3Eg` done in class), please serve this S3 uploader example over HTTPS.
 
 ## Submission
 

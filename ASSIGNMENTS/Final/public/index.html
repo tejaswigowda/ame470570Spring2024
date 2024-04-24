@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSS Reader</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script>
+        var allFeeds = null;
+        var allItems = null;
+        currSelectedFeed = null;
+        var main = function () {
+            $.ajax({
+                url: './getFeeds',
+                type: 'GET',
+                success: function (data) {
+                    console.log(data);
+                    allFeeds = data;
+                    generateFeedList();
+
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        function deleteFeed() {
+            var item = allFeeds[currSelectedFeed];
+            var confirmDelete = confirm('Are you sure you want to delete the feed ' + item.name);
+            if (confirmDelete) {
+                console.log('Deleting feed ' + item.name);
+                $.ajax({
+                    url: './deleteFeed?id=' + item._id,
+                    type: 'GET',
+                    success: function (data) {
+                        allFeeds = data;
+                        generateFeedList();
+                        document.getElementById("feedList").innerHTML = "";
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            }
+        }
+
+        function editFeed() {
+            var item = allFeeds[currSelectedFeed];
+            var newName = prompt('Enter the new name for the feed', item.name);
+            if (newName) {
+                console.log(newName);
+                $.ajax({
+                    url: './editFeed?id=' + item._id + '&name=' + newName,
+                    type: 'GET',
+                    success: function (data) {
+                        allFeeds[currSelectedFeed].name = newName;
+                        $("#allFeeds button:nth-of-type(" + (currSelectedFeed + 1) + ") h2").html(newName);
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            }
+        }
+
+        function generateFeedList() {
+            var markup = '';
+            for (var i = 0; i < allFeeds.length; i++) {
+                markup += '<button onclick="loadFeed(' + i + ')"><h2>' + allFeeds[i].name + "</h2><p>" + allFeeds[i].url + '</p></button>';
+            }
+            $('#allFeeds').html(markup);
+        }
+
+
+
+
+        function loadFeed(index) {
+            $("body").removeClass("state0 state2").addClass("state1");
+            currSelectedFeed = index;
+            $("#allFeeds button").removeClass("selected");
+            $("#allFeeds button:nth-of-type(" + (index + 1) + ")").addClass("selected");
+            //$("#mainMenu2").fadeIn();
+            //('Loading feed ' + index);
+            var url = allFeeds[index].url;
+
+            displayFeed(url);
+        }
+        function displayFeed(url) {
+            $.ajax({
+                url: './getFeed?url=' + url,
+                type: 'GET',
+                success: function (data) {
+                    console.log(data);
+                    allItems = data.feed.results;
+                    generateItemList();
+
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        function generateItemList() {
+            var sortedArray = allItems;
+            var sortSel = document.getElementById("sort").value;
+
+            if (sortSel === "name") {
+                sortedArray.sort(function (a, b) {
+                    var nameA = a.name.toLowerCase(), nameB = b.name.toLowerCase()
+                    if (nameA < nameB) //sort string ascending
+                        return -1
+                    if (nameA > nameB)
+                        return 1
+                    return 0 //default return value (no sorting)
+                });
+            }
+            else if (sortSel === "artistName") {
+                sortedArray.sort(function (a, b) {
+                    var nameA = a.artistName.toLowerCase(), nameB = b.artistName.toLowerCase()
+                    if (nameA < nameB) //sort string ascending
+                        return -1
+                    if (nameA > nameB)
+                        return 1
+                    return 0 //default return value (no sorting)
+                });
+            }
+            else if (sortSel === "releaseDate") {
+                sortedArray.sort(function (a, b) {
+                    var dateA = new Date(a.releaseDate).getTime(), dateB = new Date(b.releaseDate).getTime()
+                    return dateA - dateB //sort by date ascending
+                });
+            }
+
+
+            var markup = '';
+            for (var i = 0; i < sortedArray.length; i++) {
+                markup += '<button onclick="showDetails(' + i + ')">' +
+                    '<div class="thumb" style="background-image:url(' + sortedArray[i].artworkUrl100 + ')"></div>' +
+                    '<h1>' + sortedArray[i].name + '</h1>' +
+                    '<h2>' + sortedArray[i].artistName + '</h2>' +
+                    '</button>';
+            }
+            $('#feedList').html(markup);
+        }
+
+        var showDetails = function (index) {
+            $("body").removeClass("state0 state1").addClass("state2");
+            $("#feedList button").removeClass("selected");
+            $("#feedList button:nth-of-type(" + (index + 1) + ")").addClass("selected");
+            var item = allItems[index];
+            var markup = "<h1>" + item.name + "</h1>" +
+                "<h2>" + item.artistName + "</h2>" +
+                "<img src='" + item.artworkUrl100 + "' />" +
+                "<p>" + item.releaseDate + "</p>" +
+                //"<p>" + item.genres[0].name + "</p>" +
+                "<a target='_blank' href='" + item.url + "'>" + item.url + "</a>";
+            $('#feedDetails').html(markup);
+        }
+
+        var addNewFeed = function () {
+            var url = prompt('Enter the URL of the RSS feed');
+            if (url) {
+                console.log(url);
+                $.ajax({
+                    url: './addFeed?url=' + url,
+                    type: 'GET',
+                    success: function (data) {
+                        allFeeds = data;
+                        generateFeedList();
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            }
+        }
+
+
+        function goBack() {
+            if ($("body").hasClass("state2")) {
+                $("body").removeClass("state0 state2").addClass("state1");
+            }
+            else if ($("body").hasClass("state1")) {
+                $("body").removeClass("state1 state2").addClass("state0");
+            }
+        }
+    </script>
+</head>
+
+<body onload="main()" class="state0">
+    <div id="mainMenu">
+        <button onclick="addNewFeed()">Add New Feed</button>
+        <div id="allFeeds"> </div>
+    </div>
+    <div id="mainMenu2" style>
+        <button onclick="editFeed()">Edit Feed</button>
+        <button onclick="deleteFeed()">Delete Feed</button>
+        <select id="sort" onchange="generateItemList()">
+            <option value="default">Default</option>
+            <option value="name">Name</option>
+            <option value="artistName">Artist</option>
+            <option value="releaseDate">Release Date</option>
+        </select>
+        <div id="feedList"> </div>
+    </div>
+    <div id="feedDetails"> </div>
+
+    <button id='backButton' onclick="goBack()" style="position: fixed;top:0;left:0">Back</button>
+</body>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+
+    #mainMenu {
+        width: 300px;
+        float: left;
+        height: 100vh;
+        background-color: rgb(255, 0, 162);
+    }
+
+    #feedList {
+        width: 300px;
+        float: left;
+        height: 100vh;
+        background-color: aqua;
+    }
+
+    #feedDetails {
+        width: calc(100vw - 600px);
+        float: right;
+        height: 100vh;
+        background-color: beige;
+        text-align: center;
+        font-size: 200%;
+        position: fixed;
+        right: 0;
+    }
+
+    #feedList button {
+        width: 100%;
+        min-height: 100px;
+        border: none;
+        display: block;
+        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+    }
+
+    #feedList button .thumb {
+        width: 100px;
+        height: 100px;
+        float: left;
+        background-size: cover;
+        background-position: center;
+    }
+
+    #allFeeds button {
+        width: 100%;
+        min-height: 100px;
+        border: none;
+        display: block;
+        box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+    }
+
+    #allFeeds button h2 {
+        margin: 0;
+    }
+
+    #allFeeds button p {
+        margin: 0;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+
+    }
+
+    .selected {
+        background-color: gold;
+    }
+
+    #backButton {
+        display: none;
+    }
+
+
+    #mainMenu2 > button {
+        margin-left: -470px
+    }
+
+    @media (max-width: 600px) {
+        #mainMenu2 > button{
+            margin-left: 50px;
+        }
+
+        #feedList {
+            width: 100vw;
+        }
+
+        body.state1 #backButton,
+        body.state2 #backButton {
+            display: block;
+        }
+
+        #mainMenu {
+            width: 100vw;
+        }
+
+        #mainMenu2 {
+            width: 100vw;
+            display: none;
+        }
+
+        #feedDetails {
+            width: 100vw;
+            display: none;
+        }
+
+        body.state1 #mainMenu {
+            display: none;
+        }
+
+        body.state1 #mainMenu2 {
+            display: block;
+        }
+
+        body.state1 #feedDetails {
+            display: none;
+        }
+
+        body.state2 #mainMenu {
+            display: none;
+        }
+
+        body.state2 #mainMenu2 {
+            display: none;
+        }
+
+        body.state2 #feedDetails {
+            display: block;
+        }
+
+
+    }
+</style>
+
+</html>
